@@ -1,5 +1,5 @@
 // vue コンポーネントのインポート
-import component from './HelloWorld.vue';
+import component from './my-component.vue';
 
 // Vue.use() によって実行される install 関数を定義
 export function install(Vue) {
