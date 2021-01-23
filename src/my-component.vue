@@ -1,15 +1,19 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h3>Hello Sample Component</h3>
-  </div>
+  <div class="example">{{ message }}</div>
 </template>
 
 <script>
 export default {
-  name: 'MyComponent',
-  props: {
-    msg: String
+  data () {
+    return {
+      message: 'Hello world!'
+    }
   }
 }
 </script>
+
+<style>
+.example {
+  color: red;
+}
+</style>
