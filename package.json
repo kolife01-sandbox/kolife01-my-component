@@ -1,5 +1,5 @@
 {
-  "name": "my-component",
+  "name": "@kolife01/my-component",
   "version": "0.1.0",
   "private": false,
   "main": "dist/my-component.umd.js",
