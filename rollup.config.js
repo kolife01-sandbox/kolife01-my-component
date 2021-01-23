@@ -1,131 +1,18 @@
-// https://www.voorhoede.nl/en/blog/turning-vue-components-into-reusable-npm-packages/
-// https://github.com/voorhoede/vue-lazy-load
-
-import vue from 'rollup-plugin-vue';
-import buble from 'rollup-plugin-buble';
-import commonjs from 'rollup-plugin-commonjs';
-import replace from 'rollup-plugin-replace';
-import { terser } from 'rollup-plugin-terser';
-import resolve from 'rollup-plugin-node-resolve';
-import css from 'rollup-plugin-css-only';
-import minimist from 'minimist';
-import pkg from './package.json';
-
-const argv = minimist(process.argv.slice(2));
-
-const baseConfig = {
-  input: 'src/index.js',
-  plugins: {
-    preVue: [
-      replace({
-        'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
-      commonjs(),
-    ],
-    vue: {
-      css: true,
-      template: {
-        isProduction: true,
-      },
+import commonjs from 'rollup-plugin-commonjs'; // CommonJS モジュールを ES6 に変換
+import vue from 'rollup-plugin-vue'; // .vue 単一ファイルコンポーネントを取得
+import buble from 'rollup-plugin-buble'; // 適切にブラウザをサポートするトランスパイラおよびポリフィル
+export default {
+    input: 'src/index.js', // Path relative to package.json
+    output: {
+        name: 'MyComponent',
+        exports: 'named',
     },
-    postVue: [
-      buble({
-        transforms: {
-          dangerousForOf: true,
-        },
-      }),
+    plugins: [
+        commonjs(),
+        vue({
+            css: true, // css を <style> タグとして注入
+            compileTemplate: true, // 明示的にテンプレートを描画関数に変換
+        }),
+        buble(), // ES5 へトランスパイルする
     ],
-  },
 };
-
-// Customize configs for individual targets
-const buildFormats = [];
-if (!argv.format || argv.format === 'es') {
-  const esConfig = {
-    ...baseConfig,
-    output: {
-      file: pkg.module,
-      format: 'esm',
-      exports: 'named',
-      sourcemap: true,
-    },
-    plugins: [
-      ...baseConfig.plugins.preVue,
-      css({
-        output: pkg.style,
-      }),
-      vue({
-        ...baseConfig.plugins.vue,
-        css: false,
-      }),
-      ...baseConfig.plugins.postVue,
-      terser({
-        output: {
-          ecma: 6,
-        },
-      }),
-      resolve(),
-    ],
-  };
-  buildFormats.push(esConfig);
-}
-
-if (!argv.format || argv.format === 'cjs') {
-  const umdConfig = {
-    ...baseConfig,
-    output: {
-      compact: true,
-      file: pkg.main,
-      format: 'cjs',
-      name: 'VueLazyLoad',
-      exports: 'named',
-      sourcemap: true,
-    },
-    plugins: [
-      ...baseConfig.plugins.preVue,
-      css({
-        output: pkg.style,
-      }),
-      vue({
-        ...baseConfig.plugins.vue,
-        template: {
-          ...baseConfig.plugins.vue.template,
-          optimizeSSR: true,
-        },
-        css: false,
-      }),
-      ...baseConfig.plugins.postVue,
-      resolve(),
-    ],
-  };
-  buildFormats.push(umdConfig);
-}
-
-if (!argv.format || argv.format === 'iife') {
-  const unpkgConfig = {
-    ...baseConfig,
-    output: {
-      compact: true,
-      file: pkg.unpkg,
-      format: 'iife',
-      name: 'VueLazyLoad',
-      exports: 'named',
-      sourcemap: true,
-    },
-    plugins: [
-      ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
-      ...baseConfig.plugins.postVue,
-      terser({
-        output: {
-          ecma: 5,
-        },
-      }),
-      resolve(),
-    ],
-  };
-  buildFormats.push(unpkgConfig);
-}
-
-// Export config
-export default buildFormats;

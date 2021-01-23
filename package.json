@@ -17,7 +17,10 @@
   ],
   "scripts": {
     "prebuild": "rm -rf dist/",
-    "build": "NODE_ENV=production rollup --c rollup.config.js",
+    "build": "npm run build:umd & npm run build:es & npm run build:unpkg",
+    "build:umd": "rollup --config rollup.config.js --format umd --file dist/my-component.umd.js",
+    "build:es": "rollup --config rollup.config.js --format es --file dist/my-component.esm.js",
+    "build:unpkg": "rollup --config rollup.config.js --format iife --file dist/my-component.min.js",
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint"
   },
