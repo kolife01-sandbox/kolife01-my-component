@@ -1,11 +1,13 @@
 // Import vue component
-import component from './my-component.vue';
+import MyComponent from './my-component.vue';
+import BlueComponent from './blue-component.vue'
 
 // install function executed by Vue.use()
 function install(Vue) {
   if (install.installed) return;
   install.installed = true;
-  Vue.component('MyComponent', component);
+  Vue.component('MyComponent', MyComponent);
+  Vue.component('BlueComponent', BlueComponent);
 }
 
 // Create module definition for Vue.use()
@@ -24,9 +26,12 @@ if (GlobalVue) {
   GlobalVue.use(plugin);
 }
 
-// Inject install function into component - allows component
-// to be registered via Vue.use() as well as Vue.component()
-component.install = install;
+// // Inject install function into component - allows component
+// // to be registered via Vue.use() as well as Vue.component()
+// component.install = install;
 
 // Export component by default
-export default component;
+export default {
+  MyComponent,
+  BlueComponent
+}
